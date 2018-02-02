@@ -12,7 +12,18 @@ const server = http.createServer(app);
 var io = socketIO(server);
 io.on('connection', (socket) => {
     console.log('New user connected!!!');
-
+    //Send a welcome message to the user who just logged in
+    socket.emit('newMessage',{
+        from: 'System',
+        text: 'Welcome to the chat app!!!',
+        createdAt: new Date().getTime()
+    });
+    //Notify other users that a new user has logged in
+    socket.broadcast.emit('newMessage',{
+        from: 'System',
+        text: 'An user has been logged in',
+        createdAt: new Date().getTime()
+    })
     socket.on('createEmail', (email) => {
         console.log('Create Email', email);
         io.emit('newEmail', {
