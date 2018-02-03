@@ -1,4 +1,6 @@
 var socket = io();
+var locationButton = jQuery('#send-location');
+
 socket.on('connect', function () {
     console.log('Connected to server!!!');
 });
@@ -13,18 +15,38 @@ socket.on('newMessage', function (message) {
     $('#messages').append(li);
 
 });
-// socket.emit('createMessage', {
-//     from: 'Han Trinh',
-//     text: "I'm fine, tks"
-// }, function(data) {
-//     console.log('Got it', data);
-// });
-$('#message-form').on('submit',function(event){
+
+socket.on('newLocationMessage', function (message) {
+    console.log('New message:', message);
+    var li = $('<li></li>');  
+    var a = $('<a target="_blank"></a>');
+    li.text(`${message.from}: `);
+    a.text(`${message.text}`);
+    a.attr('href', message.url);
+    li.append(a);
+    $('#messages').append(li);
+});
+
+$('#message-form').on('submit', function (event) {
     event.preventDefault();
-    socket.emit('createMessage',{
+    socket.emit('createMessage', {
         from: 'User',
         text: $('[name=message]').val()
-    },function() {
+    }, function () {
 
+    });
+});
+locationButton.on('click', function () {
+    if (!navigator.geolocation) {
+        return alert('Geolocation not supported by your browser')
+    }
+    navigator.geolocation.getCurrentPosition(function (position) {
+        socket.emit('createLocationMessage', {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+        });
+    }, function (err) {
+        console.log('err', err);
+        alert('Unable to specified your location');
     });
 });
