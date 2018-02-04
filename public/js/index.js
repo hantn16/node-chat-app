@@ -1,3 +1,4 @@
+
 var socket = io();
 var locationButton = jQuery('#send-location');
 var messageTextbox = $('[name=message]');
@@ -11,8 +12,9 @@ socket.on('disconnect', function () {
 
 socket.on('newMessage', function (message) {
     console.log('New message:', message);
+    var formattedTime = moment(message.createdAt).format('hh:mm a');
     var li = $('<li></li>');
-    li.text(`${message.from}: ${message.text}`);
+    li.text(`${message.from} ${formattedTime}: ${message.text}`);
     $('#messages').append(li);
 
 });
@@ -21,7 +23,8 @@ socket.on('newLocationMessage', function (message) {
     console.log('New message:', message);
     var li = $('<li></li>');  
     var a = $('<a target="_blank"></a>');
-    li.text(`${message.from}: `);
+    var formattedTime = moment(message.createdAt).format('hh:mm a');
+    li.text(`${message.from} ${formattedTime}: `);
     a.text(`${message.text}`);
     a.attr('href', message.url);
     li.append(a);
